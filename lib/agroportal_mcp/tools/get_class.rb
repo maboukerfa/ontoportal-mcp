@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'cgi'
+require 'json'
 require 'mcp'
 require 'ontologies_api_client'
 
@@ -42,7 +43,7 @@ module AgroportalMcp
           # but `class` is Object#class (0-arity) so it never reaches the link
           # resolver. Hit the verified class endpoint directly instead.
           url = "#{ontology_url_for(ontology)}/classes/#{CGI.escape(class_id)}"
-          cls = LinkedData::Client::HTTP.get(url, language: language || 'en')
+          cls = LinkedData::Client::HTTP.get(url, display: 'all', language: language || 'en')
 
           if cls.nil? || cls.errors
             detail = cls&.errors ? Array(cls.errors).join('; ') : 'not found'
@@ -52,7 +53,7 @@ module AgroportalMcp
             )
           end
 
-          MCP::Tool::Response.new([{ type: 'text', text: format_class(cls, ontology) }])
+          MCP::Tool::Response.new([{ type: 'text', text: JSON.pretty_generate(cls.to_hash) }])
         rescue StandardError => e
           MCP::Tool::Response.new(
             [{ type: 'text', text: "Failed to fetch class: #{e.class}: #{e.message}" }],
@@ -66,23 +67,6 @@ module AgroportalMcp
           return ontology if ontology.to_s.start_with?('http')
 
           "#{LinkedData::Client.settings.rest_url}/ontologies/#{ontology}"
-        end
-
-        def format_class(cls, ontology)
-          definitions = Array(cls.definition).compact
-          synonyms    = Array(cls.synonym).compact
-
-          lines = []
-          lines << "#{cls.prefLabel || '(no preferred label)'}#{cls.obsolete? ? ' [OBSOLETE]' : ''}"
-          lines << "URI: #{cls.id}"
-          lines << "Ontology: #{ontology}"
-          unless definitions.empty?
-            lines << 'Definition:'
-            definitions.each { |d| lines << "  - #{d}" }
-          end
-          lines << "Synonyms: #{synonyms.join(', ')}" unless synonyms.empty?
-          lines << "Has children: #{cls.hasChildren ? 'yes' : 'no'}"
-          lines.join("\n")
         end
       end
     end

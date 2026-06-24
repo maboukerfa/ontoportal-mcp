@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'json'
 require 'mcp'
 require 'ontologies_api_client'
 
@@ -37,7 +38,7 @@ module AgroportalMcp
 
       class << self
         def call(match: nil, limit: nil, federate: nil, server_context: nil)
-          params = { include: 'acronym,name' }
+          params = { include: 'all' }
           params[:federate] = true if federate
 
           results = Array(LinkedData::Client::Models::Ontology.all(params))
@@ -49,7 +50,9 @@ module AgroportalMcp
           lim   = limit && limit.positive? ? limit : DEFAULT_LIMIT
           shown = onts.sort_by { |o| o.acronym.to_s.downcase }.first(lim)
 
-          MCP::Tool::Response.new([{ type: 'text', text: format_list(shown, total, errors) }])
+          payload = { total: total, shown: shown.size, ontologies: shown.map(&:to_hash) }
+          payload[:errors] = errors unless errors.empty?
+          MCP::Tool::Response.new([{ type: 'text', text: JSON.pretty_generate(payload) }])
         rescue StandardError => e
           MCP::Tool::Response.new(
             [{ type: 'text', text: "Failed to list ontologies: #{e.class}: #{e.message}" }],
@@ -66,27 +69,6 @@ module AgroportalMcp
           onts.select do |o|
             [o.acronym, o.name].compact.any? { |v| v.to_s.downcase.include?(needle) }
           end
-        end
-
-        def format_list(onts, total, errors)
-          lines = []
-          if onts.empty?
-            lines << 'No ontologies found.'
-          else
-            shown = onts.size
-            lines << (total > shown ? "Showing #{shown} of #{total} ontologies:" \
-                                    : "#{total} ontolog#{total == 1 ? 'y' : 'ies'}:")
-            lines << ''
-            onts.each { |o| lines << "- #{o.acronym}  —  #{o.name}  (#{o.id})" }
-            lines << '' << "…#{total - shown} more — raise `limit` to see them." if total > shown
-          end
-
-          unless errors.empty?
-            lines << '' << 'Warnings (some portals failed):'
-            errors.each { |e| lines << "- #{e}" }
-          end
-
-          lines.join("\n").strip
         end
       end
     end

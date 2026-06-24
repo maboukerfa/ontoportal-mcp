@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'json'
 require 'mcp'
 require 'ontologies_api_client'
 
@@ -48,7 +49,7 @@ module AgroportalMcp
             )
           end
 
-          MCP::Tool::Response.new([{ type: 'text', text: format_metrics(metrics, ontology) }])
+          MCP::Tool::Response.new([{ type: 'text', text: JSON.pretty_generate(metrics.to_hash) }])
         rescue StandardError => e
           MCP::Tool::Response.new(
             [{ type: 'text', text: "Failed to fetch metrics: #{e.class}: #{e.message}" }],
@@ -62,33 +63,6 @@ module AgroportalMcp
           return ontology if ontology.to_s.start_with?('http')
 
           "#{LinkedData::Client.settings.rest_url}/ontologies/#{ontology}"
-        end
-
-        def format_metrics(metrics, ontology)
-          sub = metrics.id.to_s[%r{/submissions/(\d+)}, 1]
-          lines = ["Metrics for #{ontology}#{sub ? " (submission ##{sub})" : ''}:"]
-          add(lines, 'Classes', delimit(metrics.classes))
-          add(lines, 'Individuals', delimit(metrics.individuals))
-          add(lines, 'Properties', delimit(metrics.properties))
-          add(lines, 'Axioms', delimit(metrics.numberOfAxioms))
-          add(lines, 'Max depth', metrics.maxDepth)
-          add(lines, 'Max child count', metrics.maxChildCount)
-          add(lines, 'Average child count', metrics.averageChildCount)
-          add(lines, 'Classes with one child', metrics.classesWithOneChild)
-          add(lines, 'Classes with >25 children', metrics.classesWithMoreThan25Children)
-          add(lines, 'Classes with no definition', metrics.classesWithNoDefinition)
-          lines.join("\n")
-        end
-
-        def add(lines, label, value)
-          lines << "#{label}: #{value}" unless value.nil? || value.to_s.strip.empty?
-        end
-
-        # Add thousands separators to integer counts (no ActionView dependency).
-        def delimit(value)
-          return nil if value.nil? || value.to_s.strip.empty?
-
-          value.to_s.reverse.gsub(/(\d{3})(?=\d)/, '\\1,').reverse
         end
       end
     end
