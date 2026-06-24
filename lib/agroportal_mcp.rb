@@ -8,6 +8,7 @@ require_relative 'agroportal_mcp/tools/list_ontologies'
 require_relative 'agroportal_mcp/tools/get_class'
 require_relative 'agroportal_mcp/tools/get_submission'
 require_relative 'agroportal_mcp/tools/get_metrics'
+require_relative 'agroportal_mcp/tools/get_agent'
 
 # AgroPortal MCP server: exposes the ontologies_api_client capabilities as MCP
 # tools. Serves over stdio for local clients (bin/agroportal_mcp) or over
@@ -21,7 +22,8 @@ module AgroportalMcp
     AgroportalMcp::Tools::ListOntologies,
     AgroportalMcp::Tools::GetClass,
     AgroportalMcp::Tools::GetSubmission,
-    AgroportalMcp::Tools::GetMetrics
+    AgroportalMcp::Tools::GetMetrics,
+    AgroportalMcp::Tools::GetAgent
   ].freeze
 
   # Configure the API client from the environment and build a server instance
