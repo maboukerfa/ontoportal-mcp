@@ -1,5 +1,7 @@
-PATH
-  remote: ../ontologies_api_ruby_client
+GIT
+  remote: https://github.com/agroportal/ontologies_api_ruby_client.git
+  revision: 016befc399a24252f7c9820c0271f674718712d9
+  branch: master
   specs:
     ontologies_api_client (2.2.0)
       activesupport (~> 7.0.4)
