@@ -1,8 +1,9 @@
 # frozen_string_literal: true
 
-require 'json'
 require 'mcp'
 require 'ontologies_api_client'
+
+require_relative 'json_dump'
 
 module AgroportalMcp
   module Tools
@@ -63,7 +64,7 @@ module AgroportalMcp
           payload = { query: query, results: Array(result.collection).map(&:to_hash) }
           errors = Array(result.errors).compact
           payload[:errors] = errors unless errors.empty?
-          MCP::Tool::Response.new([{ type: 'text', text: JSON.pretty_generate(payload) }])
+          MCP::Tool::Response.new([{ type: 'text', text: JsonDump.dump(payload) }])
         rescue StandardError => e
           MCP::Tool::Response.new(
             [{ type: 'text', text: "Search failed: #{e.class}: #{e.message}" }],

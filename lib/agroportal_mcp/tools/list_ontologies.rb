@@ -1,8 +1,9 @@
 # frozen_string_literal: true
 
-require 'json'
 require 'mcp'
 require 'ontologies_api_client'
+
+require_relative 'json_dump'
 
 module AgroportalMcp
   module Tools
@@ -52,7 +53,7 @@ module AgroportalMcp
 
           payload = { total: total, shown: shown.size, ontologies: shown.map(&:to_hash) }
           payload[:errors] = errors unless errors.empty?
-          MCP::Tool::Response.new([{ type: 'text', text: JSON.pretty_generate(payload) }])
+          MCP::Tool::Response.new([{ type: 'text', text: JsonDump.dump(payload) }])
         rescue StandardError => e
           MCP::Tool::Response.new(
             [{ type: 'text', text: "Failed to list ontologies: #{e.class}: #{e.message}" }],

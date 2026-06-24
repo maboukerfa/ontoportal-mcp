@@ -1,9 +1,10 @@
 # frozen_string_literal: true
 
 require 'cgi'
-require 'json'
 require 'mcp'
 require 'ontologies_api_client'
+
+require_relative 'json_dump'
 
 module AgroportalMcp
   module Tools
@@ -53,7 +54,7 @@ module AgroportalMcp
             )
           end
 
-          MCP::Tool::Response.new([{ type: 'text', text: JSON.pretty_generate(cls.to_hash) }])
+          MCP::Tool::Response.new([{ type: 'text', text: JsonDump.dump(cls.to_hash) }])
         rescue StandardError => e
           MCP::Tool::Response.new(
             [{ type: 'text', text: "Failed to fetch class: #{e.class}: #{e.message}" }],
