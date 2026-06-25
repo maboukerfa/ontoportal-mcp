@@ -53,7 +53,9 @@ module AgroportalMcp
       class << self
         def call(query:, ontologies: nil, exact_match: nil, require_definitions: nil,
                  pagesize: nil, federate: nil, server_context: nil)
-          params = { include: 'all', display_links: false }
+          # The search endpoint rejects include=all; it only accepts this set.
+          include = 'prefLabel,synonym,definition,notation,cui,semanticType,properties'
+          params = { include: include, display_links: false }
           params[:ontologies]          = ontologies if present?(ontologies)
           params[:require_exact_match] = true if exact_match
           params[:require_definitions] = true if require_definitions
