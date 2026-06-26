@@ -7,6 +7,7 @@ require_relative 'agroportal_mcp/tools/search_classes'
 require_relative 'agroportal_mcp/tools/list_ontologies'
 require_relative 'agroportal_mcp/tools/get_class'
 require_relative 'agroportal_mcp/tools/get_submission'
+require_relative 'agroportal_mcp/tools/list_submissions'
 require_relative 'agroportal_mcp/tools/get_metrics'
 require_relative 'agroportal_mcp/tools/get_agent'
 
@@ -22,6 +23,7 @@ module AgroportalMcp
     AgroportalMcp::Tools::ListOntologies,
     AgroportalMcp::Tools::GetClass,
     AgroportalMcp::Tools::GetSubmission,
+    AgroportalMcp::Tools::ListSubmissions,
     AgroportalMcp::Tools::GetMetrics,
     AgroportalMcp::Tools::GetAgent
   ].freeze

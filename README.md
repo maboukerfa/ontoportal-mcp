@@ -15,6 +15,7 @@ clients) or **Streamable HTTP / SSE** (for remote deployment).
 | `list_ontologies` | List the ontologies available on the portal, optionally filtered by a case-insensitive match on acronym or name. Returns acronym, name, and URI. Supports federation. |
 | `get_class` | Fetch a single class/concept by its URI within an ontology. Returns preferred label, definition(s), synonyms, obsolete status, and whether it has children. Accepts a `language` code (default `en`). |
 | `get_submission` | Get an ontology submission's metadata: version, status, format, dates, license, homepage/documentation, namespace & version IRI, natural languages, keywords, abstract, and description. Defaults to the latest submission; pass `submission_id` for a specific version. |
+| `list_submissions` | List ontology submissions with their metadata. Pass an `ontology` acronym for that ontology's full version history (newest first), or omit it to get the latest submission of every ontology on the portal — the quickest way to gather metadata across many ontologies at once. Supports a `limit` for the portal-wide listing. |
 | `get_metrics` | Get size/structure metrics for a submission: class, individual, and property counts plus hierarchy stats (max depth, max/average child count). Defaults to the latest submission. (For SKOS vocabularies, concepts count as individuals.) |
 
 More tools (e.g. `search_ontologies`, mappings, notes) can be added under
