@@ -8,24 +8,19 @@ require_relative 'json_dump'
 module AgroportalMcp
   module Tools
     # MCP tool wrapping LinkedData::Client::Models::Ontology.all — lists the
-    # ontologies available on the portal, optionally filtered by acronym/name.
+    # ontologies available on the portal.
     class ListOntologies < MCP::Tool
       DEFAULT_LIMIT = 50
 
       tool_name 'list_ontologies'
       description <<~DESC
-        List ontologies available in AgroPortal, optionally filtered by a
-        case-insensitive text match on acronym or name. Returns each ontology's
-        acronym, name, and URI. Use this to discover which ontologies exist, or
-        to find an ontology's acronym before calling get_class.
+        List ontologies available in AgroPortal. Returns each ontology's
+        acronym, name, and URI. Use this to discover which ontologies exis.
+        If u need more information about the ontologies metadata call list_submissions tool.
       DESC
 
       input_schema(
         properties: {
-          match: {
-            type: 'string',
-            description: 'Optional case-insensitive substring to filter by acronym or name, e.g. "agro".'
-          },
           limit: {
             type: 'integer',
             description: "Maximum number of ontologies to return (default #{DEFAULT_LIMIT})."
@@ -38,7 +33,7 @@ module AgroportalMcp
       )
 
       class << self
-        def call(match: nil, limit: nil, federate: nil, server_context: nil)
+        def call(limit: nil, federate: nil, server_context: nil)
           params = { include: 'all' }
           params[:federate] = true if federate
 
@@ -46,7 +41,6 @@ module AgroportalMcp
           errors  = results.select { |o| o.errors }.map(&:errors)
           onts    = results.reject { |o| o.errors }
 
-          onts = filter(onts, match)
           total = onts.size
           lim   = limit && limit.positive? ? limit : DEFAULT_LIMIT
           shown = onts.sort_by { |o| o.acronym.to_s.downcase }.first(lim)
@@ -59,17 +53,6 @@ module AgroportalMcp
             [{ type: 'text', text: "Failed to list ontologies: #{e.class}: #{e.message}" }],
             error: true
           )
-        end
-
-        private
-
-        def filter(onts, match)
-          return onts unless match.is_a?(String) && !match.strip.empty?
-
-          needle = match.strip.downcase
-          onts.select do |o|
-            [o.acronym, o.name].compact.any? { |v| v.to_s.downcase.include?(needle) }
-          end
         end
       end
     end
