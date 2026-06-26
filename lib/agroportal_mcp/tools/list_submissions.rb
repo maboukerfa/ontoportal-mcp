@@ -17,7 +17,7 @@ module AgroportalMcp
       tool_name 'list_submissions'
       description <<~DESC
         List ontology submissions (versioned uploads) from AgroPortal with their
-        metadata: version, status, format, dates, license, homepage,
+        full metadata: version, status, format, dates, license, homepage,
         documentation, namespace & version IRI, natural languages, keywords,
         abstract, and description. Pass an ontology acronym to list that
         ontology's full submission history (all versions, newest first). Omit
